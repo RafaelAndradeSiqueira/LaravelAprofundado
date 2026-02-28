@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use App\Models\User;
+use App\Http\Requests\RegisterUserRequest;
+
+use App\Services\UserService;
 
 class UserController extends Controller
 {
     public function list(){
 
-            $users = Cache::store('redis')->remember(
-            'users:list',
-            60,
-            function () {
-                return User::select('id', 'name', 'email')->get();
-            }
-        );
+        return UserService::list();
 
-    return response()->json($users);
+    }
+
+    public function register(RegisterUserRequest $request){
+
+        return UserService::register($request);
+
     }
 }

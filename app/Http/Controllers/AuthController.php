@@ -3,34 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use App\Services\AuthService;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-
-        if (!$token = Auth::guard('api')->attempt($credentials)) {
-            return response()->json(['error' => 'Credenciais inválidas'], 401);
-        }
-
-        return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
-        ]);
+        return AuthService::login($request);
     }
 
     public function me()
     {
-        return response()->json(Auth::guard('api')->user());
+        return AuthService::me();
     }
 
     public function logout()
     {
-        Auth::guard('api')->logout();
+        return AuthService::logout();
 
-        return response()->json(['message' => 'Logout realizado']);
     }
 }
