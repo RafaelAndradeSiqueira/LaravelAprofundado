@@ -1,95 +1,98 @@
-Descrição
+# Mini API — Laravel 12 (Jobs, Filas, Cache e Schedule)
 
-Este projeto foi desenvolvido com o objetivo de consolidar, na prática, conceitos fundamentais do ecossistema Laravel, incluindo:
+## Sobre o Projeto
 
-Processamento assíncrono com Jobs e Filas
+Este projeto consiste em uma API desenvolvida com **Laravel 12** com foco na aplicação prática de conceitos fundamentais de performance e processamento assíncrono, incluindo:
 
-Cache com Redis
+- Jobs e Filas (Queues)
+- Cache com Redis
+- Agendamento de tarefas (Scheduler)
+- Envio de e-mails com SMTP
+- Ambiente containerizado com Docker
 
-Agendamento de tarefas com Schedule
+A proposta é demonstrar uma arquitetura simples, porém organizada e eficiente, aplicando boas práticas do ecossistema Laravel.
 
-Envio de e-mails utilizando SMTP (Mailtrap)
+---
 
-Ambiente containerizado com Docker
+## Funcionalidades
 
-Trata-se de uma API simples de cadastro de usuários com foco em performance e organização de processamento em background.
-
-Funcionalidades
-Cadastro de Usuários
+### Cadastro de Usuários
 
 Ao realizar o cadastro de um usuário:
 
-A API retorna a resposta imediatamente.
+1. A API retorna a resposta imediatamente.
+2. Um **Job** é despachado para a fila.
+3. O envio do e-mail de boas-vindas é processado de forma **assíncrona**.
 
-Um Job é despachado para a fila.
+Essa abordagem garante melhor experiência ao usuário, evitando que o tempo de envio do e-mail impacte a resposta da requisição.
 
-O Job é responsável por processar e enviar um e-mail de boas-vindas de forma assíncrona.
+- Serviço de e-mail utilizado: **Mailtrap**
+- Processamento realizado via **Queue**
 
-Essa abordagem evita que o tempo de envio do e-mail impacte o tempo de resposta da requisição.
+---
 
-O envio de e-mails é realizado utilizando o Mailtrap como servidor SMTP.
+### Listagem de Usuários com Cache
 
-Listagem de Usuários com Cache
+A rota `/usuarios` implementa cache utilizando **Redis**.
 
-A rota /usuarios implementa cache utilizando Redis.
+#### Fluxo:
 
-Fluxo:
+- A primeira requisição consulta o banco de dados.
+- O resultado é armazenado no Redis por **1 minuto**.
+- Requisições subsequentes dentro desse intervalo retornam os dados diretamente do cache.
+- Após o tempo definido, o cache é invalidado.
 
-A primeira requisição consulta os dados diretamente no banco de dados.
+#### Benefícios:
 
-O resultado é armazenado no Redis por 1 minuto.
+- Redução significativa de consultas ao banco
+- Melhor tempo de resposta
+- Aproveitamento do Redis como banco em memória
+- Redução de carga na aplicação
 
-Requisições subsequentes dentro desse intervalo retornam os dados diretamente do cache.
+---
 
-Isso reduz consultas ao banco e melhora significativamente o tempo de resposta.
+### ⏱️ Limpeza Automática com Scheduler
 
-A utilização do Redis como banco em memória permitiu reduzir praticamente pela metade o tempo médio da consulta.
+Foi configurado o **Laravel Scheduler** para executar automaticamente, a cada 1 minuto, um comando responsável por limpar o cache da listagem de usuários.
 
-Limpeza Automática de Cache
+Isso garante:
 
-Foi configurado o Schedule do Laravel para executar automaticamente, a cada 1 minuto, um comando responsável por limpar o cache da listagem de usuários.
+- Dados atualizados
+- Controle de invalidação de cache
+- Automatização do processo
 
-Isso garante que os dados não permaneçam desatualizados por períodos prolongados.
+---
 
-Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
-Laravel 12
+- **Laravel 12**
+- **Redis**
+- **SQLite**
+- **Mailtrap**
+- **Docker**
 
-Redis
+---
 
-SQLite
+## Arquitetura Aplicada
 
-Mailtrap
+- API REST
+- Processamento assíncrono com Jobs
+- Filas para tarefas em background
+- Cache estratégico para otimização de leitura
+- Scheduler para automação de tarefas
+- Separação clara de responsabilidades
 
-Docker
+---
 
-Estrutura de Processamento
+## Objetivo do Projeto
 
-Requisições HTTP tratadas pela API
+Consolidar conhecimentos práticos em:
 
-Jobs responsáveis por tarefas assíncronas
+- Processamento assíncrono
+- Estratégias de cache
+- Performance de aplicações
+- Organização arquitetural no Laravel
 
-Filas para gerenciamento de processamento em background
+O foco principal está na melhoria de desempenho e na aplicação de boas práticas para aplicações escaláveis.
 
-Cache em Redis para otimização de leitura
-
-Schedule para execução automática de comandos
-
-Ambiente
-
-O projeto utiliza Redis via Docker para gerenciamento de cache.
-A imagem do Redis utilizada está documentada na configuração do ambiente.
-
-Objetivo
-
-Demonstrar, de forma prática, a aplicação de:
-
-Processamento assíncrono
-
-Estratégias de cache
-
-Agendamento automático de tarefas
-
-Separação de responsabilidades para melhorar performance e organização do código
-
-O foco principal do projeto é arquitetura e desempenho em aplicações Laravel.
+---
